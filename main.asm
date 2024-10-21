@@ -1,7 +1,6 @@
 ORG 0080h
 
 Main:
-	MOV P1, #11111111B
 	Clr P1.3		
 	Call ConfiguraDisplay	
 	SetB P1.3	
@@ -43,10 +42,43 @@ PreparaConfirmaSenha:
 ConfirmaSenha:
 	Clr A
 	Movc A,@A+DPTR	
+	Jz Proximo2		
 	Call Escreve	
 	Inc DPTR		
 	Jmp ConfirmaSenha
 
+Proximo2: 	
+
+	MOV R4, #00h
+	MOV R5, #00h
+	MOV R1, #10h
+
+RecebeSenha: 
+
+	Call ScanTeclado_r7	
+	SetB P1.3		
+	Clr A
+	Mov A,#'X'
+	Call Escreve	
+	
+	Clr A
+	Mov A,@R1	
+	Call Compara	
+	Inc R1
+	Inc R4
+	Cjne R4,#04h,RecebeSenha
+	
+	Cjne R5,#04h,AcessoNegado	
+
+AcessoLiberado:
+	MOV A, #20H
+	Jmp $
+
+
+
+AcessoNegado:
+	MOV A, #25H
+	Jmp $
 clearDisplay:
 	CLR P1.3	
 	CLR P1.7		
@@ -177,6 +209,15 @@ Escreve:
 	
 	Ret
 
+
+
+Compara:	
+	Cjne A,07H,Saida	
+	Inc R5
+
+Saida:
+	Ret
+
 Delay:		
 
 	Mov R0, #50
@@ -220,7 +261,7 @@ Linha1:
 
 Bt3:	
 
-	SETB F0			
+	SETB F0	
 	MOV @R1, #'3'
 	INC R1
 	RET				
@@ -307,6 +348,121 @@ Bt0:
 	INC R1	
 	RET				
 		
+
+ScanTeclado_r7:
+
+    CLR P0.3
+    CALL Linha1_r7
+    SetB P0.3
+    JB F0,Feito_r7
+
+    CLR P0.2
+    CALL Linha2_r7
+    SetB P0.2
+    JB F0,Feito_r7
+
+    CLR P0.1
+    CALL Linha3_r7
+    SetB P0.1
+    JB F0,Feito_r7
+
+    CLR P0.0
+    CALL Linha4_r7
+    SetB P0.0
+    JB F0,Feito_r7
+    JMP ScanTeclado_r7
+
+Feito_r7:
+
+    Clr F0
+    Ret
+
+Linha1_r7:
+
+    JNB P0.4, Bt3_r7
+    JNB P0.5, Bt2_r7
+    JNB P0.6, Bt1_r7
+    RET
+
+Bt3_r7:
+
+    SETB F0
+    MOV R7, #'3'
+    RET
+
+Bt2_r7:
+
+    SETB F0
+    MOV R7, #'2'
+    RET
+
+Bt1_r7:
+
+    SETB F0
+    MOV R7, #'1'
+    RET
+
+Linha2_r7:
+
+    JNB P0.4, Bt6_r7
+    JNB P0.5, Bt5_r7
+    JNB P0.6, Bt4_r7
+    RET
+
+Bt6_r7:
+
+    SETB F0
+    MOV R7, #'6'
+    RET
+
+Bt5_r7:
+
+    SETB F0
+    MOV R7, #'5'
+    RET
+
+Bt4_r7:
+
+    SETB F0
+    MOV R7, #'4'
+    RET
+
+Linha3_r7:
+
+    JNB P0.4, Bt9_r7
+    JNB P0.5, Bt8_r7
+    JNB P0.6, Bt7_r7
+    RET
+
+Bt9_r7:
+
+    SETB F0
+    MOV R7, #'9'
+    RET
+
+Bt8_r7:
+
+    SETB F0
+    MOV R7, #'8'
+    RET
+
+Bt7_r7:
+
+    SETB F0
+    MOV R7, #'7'
+    RET
+
+Linha4_r7:
+
+    JNB P0.5, Bt0_r7
+    RET
+
+Bt0_r7:
+    SETB F0
+    MOV R7, #'0'
+    RET
+
+
 
 TxtPedeSenha:		DB 'C', 'R', 'I', 'E', 32, 'S', 'E', 'N', 'H', 'A',':',0
 TxtConfirmaSenha:   DB 'C', 'O', 'N', 'F', 'I', 'R', 'M', 'E', ':', 0
