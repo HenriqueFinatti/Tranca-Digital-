@@ -32,8 +32,8 @@ Iterar:
 	Cjne R6, #04H, Iterar
 
 PreparaConfirmaSenha:
+	
 	Call clearDisplay
-
 	CALL PosicaoCursor
 	Setb p1.3
 	MOV DPTR, #TxtConfirmaSenha
@@ -68,17 +68,70 @@ RecebeSenha:
 	Inc R4
 	Cjne R4,#04h,RecebeSenha
 	
-	Cjne R5,#04h,AcessoNegado	
+	Cjne R5,#04h,SenhaIncorreta	
 
-AcessoLiberado:
-	MOV A, #20H
-	Jmp $
+SenhaCorreta:
+	;MOV P1, #10010010B
+
+	Call delay
+	Call delay
+
+	Jmp PreparaTentativas
+
+SenhaIncorreta:
+	Jmp PreparaConfirmaSenha
 
 
+PreparaTentativas:
+	Call clearDisplay
+	CALL PosicaoCursor
+	Setb p1.3
+	MOV DPTR, #TxtTentativa
 
-AcessoNegado:
-	MOV A, #25H
-	Jmp $
+PedeTentativa:
+	Clr A
+	Movc A,@A+DPTR	
+	Jz Proximo3		
+	Call Escreve	
+	Inc DPTR		
+	Jmp PedeTentativa
+
+Proximo3: 	
+
+	MOV R4, #00h
+	MOV R5, #00h
+	MOV R1, #10h
+	MOV R2, #00h
+
+RecebeSenha2: 
+
+	
+	Call ScanTeclado_r7	
+	SetB P1.3		
+	Clr A
+	Mov A,#'X'
+	Call Escreve	
+	
+	Clr A
+	Mov A,@R1	
+	Call Compara	
+	Inc R1
+	Inc R4
+
+	Cjne R4,#04h,RecebeSenha2
+	
+	Cjne R5,#04h,SenhaIncorreta2	
+	
+
+SenhaIncorreta2:
+	INC R2
+	Cjne R2, #03H, PreparaTentativas
+	Jmp TentativasExcedidas
+
+TentativasExcedidas:
+	MOV A, #30H
+
+
 clearDisplay:
 	CLR P1.3	
 	CLR P1.7		
@@ -466,3 +519,4 @@ Bt0_r7:
 
 TxtPedeSenha:		DB 'C', 'R', 'I', 'E', 32, 'S', 'E', 'N', 'H', 'A',':',0
 TxtConfirmaSenha:   DB 'C', 'O', 'N', 'F', 'I', 'R', 'M', 'E', ':', 0
+TxtTentativa:       DB 'I', 'N', 'S', 'I', 'R', 'A', ':', 0
