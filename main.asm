@@ -1,6 +1,8 @@
 ORG 0080h
 
 Main:
+	MOV R2, #03h
+
 	Clr P1.3		
 	Call ConfiguraDisplay	
 	SetB P1.3	
@@ -71,7 +73,6 @@ RecebeSenha:
 	Cjne R5,#04h,SenhaIncorreta	
 
 SenhaCorreta:
-	;MOV P1, #10010010B
 
 	Call delay
 	Call delay
@@ -82,11 +83,16 @@ SenhaIncorreta:
 	Jmp PreparaConfirmaSenha
 
 
+
 PreparaTentativas:
 	Call clearDisplay
 	CALL PosicaoCursor
 	Setb p1.3
 	MOV DPTR, #TxtTentativa
+
+	CLR A
+	Mov A, R2
+	Jz TentativasExcedidas
 
 PedeTentativa:
 	Clr A
@@ -101,11 +107,12 @@ Proximo3:
 	MOV R4, #00h
 	MOV R5, #00h
 	MOV R1, #10h
-	MOV R2, #00h
+	
 
 RecebeSenha2: 
-
 	
+
+
 	Call ScanTeclado_r7	
 	SetB P1.3		
 	Clr A
@@ -120,13 +127,12 @@ RecebeSenha2:
 
 	Cjne R4,#04h,RecebeSenha2
 	
+	DEC R2
 	Cjne R5,#04h,SenhaIncorreta2	
 	
 
 SenhaIncorreta2:
-	INC R2
-	Cjne R2, #03H, PreparaTentativas
-	Jmp TentativasExcedidas
+	Jmp PreparaTentativas
 
 TentativasExcedidas:
 	MOV A, #30H
