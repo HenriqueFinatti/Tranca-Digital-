@@ -111,8 +111,6 @@ Proximo3:
 
 RecebeSenha2: 
 	
-
-
 	Call ScanTeclado_r7	
 	SetB P1.3		
 	Clr A
@@ -131,13 +129,46 @@ RecebeSenha2:
 	Cjne R5,#04h,SenhaIncorreta2	
 	
 
+AcessoPermitido:
+	MOV A, #43H
+	JMP $
+
 SenhaIncorreta2:
 	Jmp PreparaTentativas
 
 TentativasExcedidas:
-	MOV A, #30H
+	Call clearDisplay
+	MOV DPTR, #TxtBloqueado
+	Call EscreveBloqueado
+	CALL clearDisplay
+	MOV DPTR, #TxtTentativa
+	CALL EscreveBloqueado
+	CALL Delay
+	cALL PosicaoCursor
+	MOV DPTR, #TxtChave
+	CALL EscreveBloqueado
+	JMP $
 
 
+EscreveBloqueado:
+	Clr A
+	Movc A,@A+DPTR	
+	Jz Saida		
+	Call Escreve	
+	Inc DPTR		
+	Jmp EscreveBloqueado
+
+Proximo4:
+	MOV A, #44H
+	JMP $
+
+
+
+Compara:	
+	Cjne A,07H,Saida	
+	Inc R5
+Saida:
+	Ret
 clearDisplay:
 	CLR P1.3	
 	CLR P1.7		
@@ -270,12 +301,9 @@ Escreve:
 
 
 
-Compara:	
-	Cjne A,07H,Saida	
-	Inc R5
 
-Saida:
-	Ret
+
+
 
 Delay:		
 
@@ -526,3 +554,5 @@ Bt0_r7:
 TxtPedeSenha:		DB 'C', 'R', 'I', 'E', 32, 'S', 'E', 'N', 'H', 'A',':',0
 TxtConfirmaSenha:   DB 'C', 'O', 'N', 'F', 'I', 'R', 'M', 'E', ':', 0
 TxtTentativa:       DB 'I', 'N', 'S', 'I', 'R', 'A', ':', 0
+TxtBloqueado: 		DB 'B', 'L', 'O', 'Q', 'U', 'E', 'A', 'D', 'O', 0
+TxtChave:  			DB 'C', 'H', 'A', 'V', 'E', 32, 'M', 'E', 'S', 'T', 'R', 'A', 0
