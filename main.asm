@@ -7,16 +7,8 @@ Main:
 	Call ConfiguraDisplay	
 	SetB P1.3	
 	MOV DPTR, #TxtPedeSenha	
+	Call Escreve
 
-PedeSenha:
-
-	Clr A
-	Movc A,@A+DPTR	
-	Jz Proximo		
-	Call Escreve	
-	Inc DPTR		
-	Jmp PedeSenha
-	
 Proximo: 	
 
 	MOV R1, #10h
@@ -28,7 +20,7 @@ Iterar:
 	SetB P1.3		
 	Clr A
 	Mov A, #'X'
-	Call Escreve	
+	Call CriptoGrafa	
 	
 	Inc R6
 	Cjne R6, #04H, Iterar
@@ -36,18 +28,9 @@ Iterar:
 PreparaConfirmaSenha:
 	
 	Call clearDisplay
-	CALL PosicaoCursor
 	Setb p1.3
 	MOV DPTR, #TxtConfirmaSenha
-
-
-ConfirmaSenha:
-	Clr A
-	Movc A,@A+DPTR	
-	Jz Proximo2		
-	Call Escreve	
-	Inc DPTR		
-	Jmp ConfirmaSenha
+	Call Escreve
 
 Proximo2: 	
 
@@ -61,7 +44,7 @@ RecebeSenha:
 	SetB P1.3		
 	Clr A
 	Mov A,#'X'
-	Call Escreve	
+	Call CriptoGrafa	
 	
 	Clr A
 	Mov A,@R1	
@@ -82,11 +65,8 @@ SenhaCorreta:
 SenhaIncorreta:
 	Jmp PreparaConfirmaSenha
 
-
-
 PreparaTentativas:
 	Call clearDisplay
-	CALL PosicaoCursor
 	Setb p1.3
 	MOV DPTR, #TxtTentativa
 
@@ -94,13 +74,7 @@ PreparaTentativas:
 	Mov A, R2
 	Jz TentativasExcedidas
 
-PedeTentativa:
-	Clr A
-	Movc A,@A+DPTR	
-	Jz Proximo3		
-	Call Escreve	
-	Inc DPTR		
-	Jmp PedeTentativa
+	Call Escreve
 
 Proximo3: 	
 
@@ -108,14 +82,13 @@ Proximo3:
 	MOV R5, #00h
 	MOV R1, #10h
 	
-
 RecebeSenha2: 
 	
 	Call ScanTeclado_r7	
 	SetB P1.3		
 	Clr A
 	Mov A,#'X'
-	Call Escreve	
+	Call CriptoGrafa	
 	
 	Clr A
 	Mov A,@R1	
@@ -126,43 +99,90 @@ RecebeSenha2:
 	Cjne R4,#04h,RecebeSenha2
 	
 	DEC R2
-	Cjne R5,#04h,SenhaIncorreta2	
+	Cjne R5,#04h,PreparaTentativas	
 	
 
 AcessoPermitido:
 	MOV A, #43H
 	JMP $
 
-SenhaIncorreta2:
-	Jmp PreparaTentativas
-
 TentativasExcedidas:
 	Call clearDisplay
+	
 	MOV DPTR, #TxtBloqueado
-	Call EscreveBloqueado
+	
+	Call Escreve
+	Call Delay
 	CALL clearDisplay
+	
 	MOV DPTR, #TxtTentativa
-	CALL EscreveBloqueado
+	
+	CALL Escreve
 	CALL Delay
 	cALL PosicaoCursor
+	
 	MOV DPTR, #TxtChave
-	CALL EscreveBloqueado
+	
+	CALL CriaChaveMestre
+
+	CALL Escreve
+	Call Delay
+	Call clearDisplay
+
+	MOV DPTR, #TxtTentativa
+	
+	CALL Escreve
+
+Proximo5:
+	MOV R4, #00h
+	MOV R5, #00h
+	MOV R1, #30h
+	
+RecebeSenha3: 
+	
+	Call ScanTeclado_r7	
+	SetB P1.3		
+	Clr A
+	Mov A,#'X'
+	Call CriptoGrafa	
+	
+	Clr A
+	Mov A,@R1	
+	Call Compara	
+	Inc R1
+	Inc R4
+
+	Cjne R4,#04h,RecebeSenha3
+	
+	DEC R2
+	Cjne R5,#04h,Bloqueado	
+
+
+Acertou:
+	MOV A, #70H
 	JMP $
 
+Bloqueado:
+	MOV A, #66H
+	JMP $
 
-EscreveBloqueado:
+CriaChaveMestre:
+	MOV 30h, #1h
+	MOV 31h, #2h
+	MOV 32h, #3h
+	MOV 33h, #4h
+
+Escreve:
 	Clr A
 	Movc A,@A+DPTR	
 	Jz Saida		
-	Call Escreve	
+	Call CriptoGrafa	
 	Inc DPTR		
-	Jmp EscreveBloqueado
+	Jmp Escreve
 
 Proximo4:
 	MOV A, #44H
 	JMP $
-
-
 
 Compara:	
 	Cjne A,07H,Saida	
@@ -271,7 +291,7 @@ Pulso:
 	Clr  P1.2		
 	Ret
 
-Escreve:	
+CriptoGrafa:	
 	Setb P1.3
 
 	Mov C, ACC.7		
@@ -298,12 +318,6 @@ Escreve:
 	Call Delay		
 	
 	Ret
-
-
-
-
-
-
 
 Delay:		
 
