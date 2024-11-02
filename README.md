@@ -2,8 +2,8 @@
 
 
 # ALUNOS:
-Henrique Finatti 22.123.030-3
-Tiago Fagundes 22.123.017-0
+- Henrique Finatti 22.123.030-3
+- Tiago Fagundes 22.123.017-0
 
 # Projeto: Tranca Digital com senha em Assembly.
 Esse projeto tem como objetivo o desenvolvimento de uma aplicação que simula uma porta digital, utilizando a linguagem Assembly.
