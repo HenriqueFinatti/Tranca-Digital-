@@ -51,10 +51,9 @@ O objetivo deste projeto é desenvolver um sistema de acesso em que o usuário c
 
 - Quando o usuário acertar a senha que ele criou ou a senha mestre, irá retornar uma mensagem e o motor irá girar:
 
-![Imagem de exemplo](img/Acesso_aprovado_motor_girando.png)
+  ![Imagem de exemplo](img/Acesso_aprovado_motor_girando.png)
 
 
-      -
 
     
 
