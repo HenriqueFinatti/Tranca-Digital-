@@ -17,3 +17,6 @@ O objetivo deste projeto é desenvolver um sistema de acesso em que o usuário c
 - Display LCD
 
 # Diagrama:
+
+![Imagem de exemplo](img/Fluxograma.jpg)
+
