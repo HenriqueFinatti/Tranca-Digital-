@@ -42,14 +42,14 @@ O objetivo deste projeto é desenvolver um sistema de acesso em que o usuário c
   ![Imagem de exemplo](img/insira_senha_1.png)
 
 
-  - Caso o usuario erre a senha 3 vezes, o nosso programa irá bloquear e pedir a senha mestre:
+- Caso o usuario erre a senha 3 vezes, o nosso programa irá bloquear e pedir a senha mestre:
 
   ![Imagem de exemplo](img/Bloqueado.png)
 
   ![Imagem de exemplo](img/Insira_chave_mestre.png)
 
 
--- Quando o usuário acertar a senha que ele criou ou a senha mestre, irá retornar uma mensagem e o motor irá girar:
+- Quando o usuário acertar a senha que ele criou ou a senha mestre, irá retornar uma mensagem e o motor irá girar:
 
 ![Imagem de exemplo](img/Acesso_aprovado_motor_girando.png)
 
