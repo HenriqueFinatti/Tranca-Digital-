@@ -17,3 +17,45 @@ O objetivo deste projeto é desenvolver um sistema de acesso em que o usuário c
 - Display LCD
 
 # Diagrama:
+
+![Imagem de exemplo](img/Fluxograma.jpg)
+
+# Imagens do programa:
+
+- Solicitação ao usuário para criar senha:
+
+  ![Imagem de exemplo](img/Cria_Senha.png)
+
+
+- Confirmação da senha:
+
+  ![Imagem de exemplo](img/Confirma_senha.png)
+
+
+- Mensagem de senha criada:
+
+  ![Imagem de exemplo](img/senha_criada.png)
+
+
+- Solicitação da senha criada para acesso a porta digital:
+
+  ![Imagem de exemplo](img/insira_senha_1.png)
+
+
+- Caso o usuario erre a senha 3 vezes, o nosso programa irá bloquear e pedir a senha mestre:
+
+  ![Imagem de exemplo](img/Bloqueado.png)
+
+  ![Imagem de exemplo](img/Insira_chave_mestre.png)
+
+
+- Quando o usuário acertar a senha que ele criou ou a senha mestre, irá retornar uma mensagem e o motor irá girar:
+
+  ![Imagem de exemplo](img/Acesso_aprovado_motor_girando.png)
+
+
+
+    
+
+  
+
