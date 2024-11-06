@@ -42,7 +42,6 @@ RecebeSenha: ;Vamos receber a confirmação da senha
 	Mov A, #'X' ;enviamos o valor de X como caracter
 	Call CriptoGrafa	;Chamamos a rotina que envia o valor do A para o display
 		
-	
 	Clr A ;Limpamos o valor de A
 	Mov A,@R0 ;Armazenamos o valor na memória do R0 no A para comparar futuramente
 	Call Compara ;Chamamos a rotina que faz a comparação
@@ -54,137 +53,142 @@ RecebeSenha: ;Vamos receber a confirmação da senha
 	
 	Cjne R5,#04h,PreparaConfirmaSenha ;Repetimos a rotina desde a preparação das variáveis caso o usuário tenha errado algum dos caracteres
 
-SenhaCorreta:
+SenhaCorreta: ; Rotina para a senha correta, apenas para orientação
 
-	CALL clearDisplay
-	MOV DPTR, #TxtSenhaAprovada
-	MOV R1, #70H
-	CALL Escreve
-	Call delay
+	CALL clearDisplay ;Chamamos a função que limpa o LCD
+	MOV DPTR, #TxtSenhaAprovada ;Movemos o texto para quando a senha é aprovada
+	;MOV R1, #70H
+	CALL Escreve ;Chamamos a rotina que escreve o texto que estiver no DPTR
+	Call delay ; Aplicamos um delay
 
-	Jmp PreparaTentativas
+	;Jmp PreparaTentativas
 
-PreparaTentativas:
-	Call clearDisplay
-	Setb p1.3
-	MOV DPTR, #TxtTentativa
+PreparaTentativas: ; Chamamos a rotina que prepara o codigo em 
+	Call clearDisplay ; Limpamos o display
+	; Setb p1.3
+	MOV R4, #00h ;Zeramos o valor de R4 para limitar o numero de caracteres por senha
+	MOV R5, #00h ;Zeramos o valor de R5 para identificar caso o usuario erre
+	MOV R0, #10h ;Movemos o valor de 10 para o R0 para acessar a senha armazena
 
-	CLR A
-	Mov A, R2
-	Jz TentativasExcedidas
+	Mov A, R2 ; Movemos para o A o valor do R2, usado para limitar o numero de vezes que o usuario pode tentar acertar a senha criada
+	
+	Jz TentativasExcedidas ; Pulamos para a rotina de tentativas excedidas caso o valor A/R2 chegue em 0
 
-	Call Escreve
+	MOV DPTR, #TxtTentativa ; Movemos o texto de tentativas para o DPTR
+	Call Escreve ;Chamamos a rotina que escreve o texto do DPTR
 
-Proximo3: 	
+RecebeSenha2: ; Rotina para receber a senha do usuário
+	
+	Call ScanTeclado ; Rotina para armazenar o valor inserido no R7	
+	SetB P1.3
+	Clr A ;Limpamos o valor de A
+	Mov A,#'X' ;Movemos o valor do caracter X para o A
+	Call CriptoGrafa ;Enviamos o caracter X para a tela 
+	
+	Clr A ; Limpamos o valor de A
+	Mov A,@R0 ;Movemos para o A o valor armazenado na posicao do valor R0
+	Call Compara ;Chamamos a rotina que compara os valores do A com o R7
+	
+	Inc R0 ;Incrementamos a posicao na memoria
+	Inc R4 ;Incrementamos o numero de caracteres inseridos
 
-	MOV R4, #00h
-	MOV R5, #00h
-	MOV R0, #10h
+	Cjne R4,#04h,RecebeSenha2 ;Repetimos o código dessa rotina enquanto o R4 não tiver valor 4 (Enquanto o usuario não inserir 4 caracteres)
 	
-RecebeSenha2: 
-	
-	Call ScanTeclado	
-	SetB P1.3		
-	Clr A
-	Mov A,#'X'
-	Call CriptoGrafa	
-	
-	Clr A
-	Mov A,@R0	
-	Call Compara	
-	Inc R0
-	Inc R4
+	DEC R2 ;Decrementamos o valor do R2 para contar como uma tentativa
 
-	Cjne R4,#04h,RecebeSenha2
-	
-	DEC R2
-	Cjne R5,#04h,PreparaTentativas	
-	
+	Cjne R5,#04h,PreparaTentativas	;Comparamos o valor do R5 (Incrementado na função compara) com 4, caso ele seja 4 então sabemos que o usuario acertou cada caracter
+									;Caso seja diferente de 4 então repetimos o código desde a função PreparaTentativas
 
-AcessoAprovado:
-	CALL clearDisplay
-	MOV DPTR, #TxtAcessoAprovado
-	Call Escreve
-	Call GiraMotor
+AcessoAprovado: ;Rotina para quando o acesso é aprovado (Dentro dessa rotina o código acaba)
+	
+	CALL clearDisplay;Limpamos o display
+	
+	MOV DPTR, #TxtAcessoAprovado ;Movemos para o DPTR o texto de Acesso Aprovado
+	Call Escreve ;Rotina que escreve o texto preste no DPTR
+	Call GiraMotor ;Rotina que gira o motor no simulador (Essa rotina encerra o código)
 
-TentativasExcedidas:
-	Call clearDisplay
+TentativasExcedidas:; Rotina para quando o usuario erra em todas as suas tentativas de acesso com a senha criada
 	
-	MOV DPTR, #TxtBloqueado
-	
-	Call Escreve
-	Call Delay
-	CALL clearDisplay
-	
-	MOV DPTR, #TxtTentativa
-	
-	CALL Escreve
-	CALL Delay
-	cALL PosicaoCursor
-	
-	MOV DPTR, #TxtChave
-	
-	CALL CriaChaveMestre
+	MOV R4, #00h ;Movemos o valor de 0 para controlar o numero de caracteres da senha
+	MOV R5, #00h ;Movemos o valor de 0 para saber quando o usuario acertou ou não 
+	MOV R0, #30h ;Movemos o valor de 30 para acessar a chave mestra na memoria
 
-	CALL Escreve
-	Call Delay
-	Call clearDisplay
-
-	MOV DPTR, #TxtTentativa
+	Call clearDisplay ;Limpamos o display
 	
-	CALL Escreve
-
-Proximo5:
-	MOV R4, #00h
-	MOV R5, #00h
-	MOV R0, #30h
+	MOV DPTR, #TxtBloqueado ; Movemos o texto de bloqueado
 	
+	Call Escreve; Escrevemos o texto no DPTR
+	Call Delay ;Um pequeno delay
+	CALL clearDisplay; Limpamos o LCD
+	
+	MOV DPTR, #TxtTentativa ;Movemos o texto de tentativa
+	
+	CALL Escreve ;Escrevemos o texto
+	CALL Delay ;Um pequeno delay
+	CALL PosicaoCursor ;Alteramos a posicao do cursor para a linha de baixo do LCD 
+	
+	MOV DPTR, #TxtChave ;Movemos o texto da Chave Mestra
+	
+	CALL CriaChaveMestre ;Chamamos a rotina que cria a chame mestra na memória
+
+	CALL Escreve ;Escrevemos o texto do DPTR no LCD (Agora na linha de baixo sem apagar o texto anterior)
+	Call Delay ;Pequeno delay
+	Call clearDisplay ;Agora limpamos o delay
+
+	MOV DPTR, #TxtTentativa ;Movemos o texto de tentativa
+	
+	CALL Escreve ;E escrevemos o texto
+
 RecebeSenha3: 
 	
-	Call ScanTeclado	
+	Call ScanTeclado ;Rotina para receber a entrada do usario
 	SetB P1.3		
-	Clr A
-	Mov A,#'X'
-	Call CriptoGrafa	
 	
-	Clr A
-	Mov A,@R0	
-	Call Compara	
-	Inc R0
-	Inc R4
-
-	Cjne R4,#04h,RecebeSenha3
+	Mov A,#'X' ;Movemos o valor do caracter X para o A
 	
-	DEC R2
-	Cjne R5,#04h,TentativasExcedidas	
+	Call CriptoGrafa	;Enviamos o X para a o LCD
+	
+	Mov A,@R0 ;Movemos para o A o valor na memória do valor do R0
+	Call Compara	;Chamamos a rotina que compara a entrada do usuario com o A
+	
+	Inc R0 ;Incrementamos o R0 para avançar na memória
+	Inc R4 ;Incrementamos o R4 para controlar o numero de caracteres inseridos
 
+	Cjne R4,#04h,RecebeSenha3 ;Repetimos o código caso o usuario ainda não tenha inserido 4 caracteres
+		
+	Cjne R5,#04h,TentativasExcedidas ;Verificamos se o usuario acertou os 4 caracteres da senha, caso contrario voltamos para a rotina de tentativas excedidas 
+									; para o usuario tentar novamente
 
-Acertou:
-	JMP AcessoAprovado
+Acertou:; Caso o usuario tenha acertado a chave Mestra então voltamos para a rotina de acesso aprovado
+	JMP AcessoAprovado 
 
-Bloqueado:
-	JMP TentativasExcedidas
-
-CriaChaveMestre:
+CriaChaveMestre: ;Rotina para criar a chave mestre na memória da posicao 30
 	MOV 30h, #'1'
 	MOV 31h, #'2'
 	MOV 32h, #'3'
 	MOV 33h, #'4'
 
-Escreve:
-	Clr A
-	Movc A,@A+DPTR	
-	Jz Saida		
-	Call CriptoGrafa	
-	Inc DPTR		
-	Jmp Escreve
+Escreve: ;Rotina para escrever o texto do DPTR
+	Clr A ;Limpamos o valor do A
+	Movc A,@A+DPTR ;Movemos para o A o valor do na memória do valor de A somado com o DPTR
+	Jz Retorna ;Caso o valor do A seja zero então retornamos para o código em que a rotina foi chamada	
+	Call CriptoGrafa ;Chamamos a rotina que envia o para o LCD o caracter presente no A
+	Inc DPTR ;Incrementamos o DPTR para a proxima posicao
+	Jmp Escreve ;Voltamos para a própria rotina como um laço
 
 Compara:	
-	Cjne A,07H,Saida	
-	Inc R5
-Saida:
+	Cjne A,07H,Retorna	;Comparamos o valor de A com o valor do armazenado em 07 na memória, caso ele seja diferente vamos para a rotina que retorna
+	Inc R5; Caso contrario incrementamos o R5 para sabermos que o usuario acertou
+
+Retorna: ;Rotina para podermos usar o 'Ret' com mais flexibilidade
 	Ret
-clearDisplay:
+
+
+;----------------------------------------------------------------------------
+;Rotina feitas de acordo com os programas de exmplo na documentação do Edsim51
+;----------------------------------------------------------------------------
+
+clearDisplay: ;Rotina que faz a limpeza dos caracteres presentes no LCD, através da alteracao dos Bits de P1
 	CLR P1.3	
 	CLR P1.7		
 	CLR P1.6		
@@ -202,14 +206,14 @@ clearDisplay:
 	SETB P1.2
 	CLR P1.2
 
-	MOV R6, #40
+	MOV R6, #30
 	rotC:
 	CALL delay
 	DJNZ R6, rotC
 	RET
 
 
-ConfiguraDisplay:	
+ConfiguraDisplay: ;Funcao para configurarmos o display para ser usado no principio do código
 	Clr  P1.3	
 	Clr  P1.7		
 	Clr  P1.6		
@@ -261,8 +265,7 @@ ConfiguraDisplay:
 	SetB P1.3
 	Ret
 
-
-PosicaoCursor:	
+PosicaoCursor:	;Rotina para mover o cursor usado para a linha inferior do LCD
 	Clr P1.3
 	SetB P1.7		
 	SetB P1.6		
@@ -281,13 +284,12 @@ PosicaoCursor:
 	Call Delay			
 	Ret
 
-Pulso:		
-
+Pulso:		;Rotina para fazer um pulso com um dos bits do P1 (Necessário para o funcionamento do LCD)
 	SetB P1.2		
 	Clr  P1.2		
 	Ret
 
-CriptoGrafa:	
+CriptoGrafa: ;Rotina para enviar o caracter presente no A para o LCD
 	Setb P1.3
 
 	Mov C, ACC.7		
@@ -315,31 +317,31 @@ CriptoGrafa:
 	
 	Ret
 
-Delay:		
+Delay:	;Rotina para aplicar delay
 
 	Mov R3, #50
 	Djnz R3, $
 	Ret
 			
-ScanTeclado:	
-
+ScanTeclado: ;Rotina para ler a entrada do usuario
+	
 	CLR P0.3			
-	CALL Linha1
+	CALL Linha1 ;Rotina para ler a primeira linha da matriz do teclado
 	SetB P0.3			
 	JB F0,Feito  		
 				
 	CLR P0.2			
-	CALL Linha2		
+	CALL Linha2	;Rotina para ler a segunda linha da matriz do teclado
 	SetB P0.2			
 	JB F0,Feito						
 
 	CLR P0.1			
-	CALL Linha3		
+	CALL Linha3	;Rotina para ler a terceira linha da matriz do teclado
 	SetB P0.1			
 	JB F0,Feito							
 
 	CLR P0.0			
-	CALL Linha4		
+	CALL Linha4	;Rotina para ler a quarta linha da matriz do teclado	
 	SetB P0.0			
 	JB F0,Feito														
 	JMP ScanTeclado							
@@ -350,112 +352,102 @@ Feito:
 	Ret
 	
 Linha1:	
-
-	JNB P0.4, Bt3	
+	;Rotina para identificarmos qual coluna foi pressionada
+	JNB P0.4, Bt3	;Armazenamos o valor de cada botão 
 	JNB P0.5, Bt2	
 	JNB P0.6, Bt1	
 	RET					
 
 Bt3:	
-
+;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
 	SETB F0	
     MOV R7, #'3'
 	MOV @R1, #'3'
-	;INC R1
 	RET				
 
 Bt2:	
-
+;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
 	SETB F0		
     MOV R7, #'2'
 	MOV @R1, #'2'
-	;INC R1
 	RET				
 
 Bt1:	
-
+;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
 	SETB F0		
     MOV R7, #'1'
 	MOV @R1, #'1'
-	;INC R1	
 	RET				
 
 Linha2:	
-
+;Rotina para identificarmos qual coluna foi pressionada
 	JNB P0.4, Bt6	
 	JNB P0.5, Bt5	
 	JNB P0.6, Bt4	
 	RET					
 
 Bt6:	
-
+;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
 	SETB F0		
     MOV R7, #'6'
 	MOV @R1, #'6'
-	;INC R1	
 	RET				
 
 Bt5:	
-
+;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
 	SETB F0		
     MOV R7, #'5'
 	MOV @R1, #'5'
-	;INC R1	
 	RET				
 
 Bt4:	
-
+;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
 	SETB F0		
     MOV R7, #'4'
 	MOV @R1, #'4'
-	;INC R1
 	RET				
 
 Linha3:	
-
+;Rotina para identificarmos qual coluna foi pressionada
 	JNB P0.4, Bt9	
 	JNB P0.5, Bt8	
 	JNB P0.6, Bt7	
 	RET					
 
 Bt9:	
-
+;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
 	SETB F0		
     MOV R7, #'9'
 	MOV @R1, #'9'
-	;INC R1	
 	RET				
 
 Bt8:	
-
+;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
 	SETB F0		
     MOV R7, #'8'
-	MOV @R1, #'8'
-	;INC R1	
+	MOV @R1, #'8'	
 	RET				
 
 Bt7:	
-
+;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
 	SETB F0		
     MOV R7, #'7'
-	MOV @R1, #'7'
-	;INC R1	
+	MOV @R1, #'7'	
 	RET				
 
 Linha4:	
-
+;Rotina para identificarmos qual coluna foi pressionada
 	JNB P0.5, Bt0	
 	RET					
 
 Bt0:	
-
+;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
 	SETB F0	
     MOV R7, #'0'
-	MOV @R1, #'0'
-	;INC R1	
+	MOV @R1, #'0'	
 	RET				
 		
-GiraMotor:          
+GiraMotor: ;Rotina para girar parte do motor  
     CLR P3.1    
     Call Delay  
     Call Delay  
@@ -484,6 +476,13 @@ GiraMotor:
     Call Delay  
     Call Delay  
 	JMP $
+
+
+;----------------------------------------------------------------------------------
+;Textos armazenados para uso durante o código
+;Colocamos cada caracter para podermos usar outros tipos de caracteres e espacos
+;Usamos o 0 como controle para saber quando o texto acaba
+;----------------------------------------------------------------------------------
 
 TxtPedeSenha:		DB 'C', 'R', 'I', 'E', 32, 'S', 'E', 'N', 'H', 'A',':',0
 TxtConfirmaSenha:   DB 'C', 'O', 'N', 'F', 'I', 'R', 'M', 'E', ':', 0
