@@ -15,6 +15,7 @@ O objetivo deste projeto é desenvolver um sistema de acesso em que o usuário c
 - Microcontrolador 8051
 - Teclado Matricial 4x4
 - Display LCD
+- Motor
 
 # Diagrama:
 
