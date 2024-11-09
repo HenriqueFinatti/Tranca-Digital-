@@ -1,18 +1,43 @@
 ORG 0080h ;Definição do inicio do programa
 
+Apresenta:
+	Call ConfiguraDisplay; Chamamos a rotina que configura o display
+	
+	MOV DPTR, #TxtApresenta1; Texto inicial da apresentacao
+	
+	Call escreve ;Chamamos a rotina que escreve o texto do DPTR
+	Call PosicaoCursor ;Movemos o cursor para a linha de baixo do LCD
+
+	MOV DPTR, #TxtApresenta2; Movemos o texto final da apresentacao para o DPTR
+	
+	Call escreve; Chamamos a rotina que escreve o texto do DPTR, agora na linha de baixo
+	Call delay; Um pequeno delay
+	Call clearDisplay; Limpamos o display
+
+	MOV DPTR, #TxtTiago; Movemos o nome do primeiro integrante
+	
+	Call escreve; Chamamos a rotina que escreve o texto que está no DPTR
+	Call PosicaoCursor; Posicionamos o cursor na linha de baixo do LCD
+
+	MOV DPTR, #TxtHenrique; Movemos o nome do segundo integrante
+	
+	Call escreve; Rotina que escreve o texto do DPTR, agora na linha de baixo
+	Call delay; um pequeno delay
+	Call clearDisplay; limpamos o display 
+
+
 Main:
 	MOV R2, #03h ; Criamos o R2 em 3 para ser usado futuramente como contador de tentativas
 	MOV R1, #10h ;Criamos o R1 em 10 para armazenarmos a senha nessa posicao da memoria
 	MOV R6, #00h ;Criamos o R6 em 0 para usarmo como contador do numero de caracteres inseridos na senha
-	
+
 	MOV DPTR, #TxtPedeSenha	;Movemos para o DPTR o texto de soliciação de senha
 
-	Call ConfiguraDisplay	;Chamamos a rotina que configura o Display para exibição
 	Call Escreve 	;Chamamos a rotina que escreve o texto presente no DPTR
 
 PedeSenha: 
 
-	Call ScanTeclado ;Chama a rotina que recebe a entrada do usuário e armazena no valor do R1 na memória e no R7 que não é usado ainda
+	Call ScanTeclado ;Chama a rotina que recebe a entrada do usuário e armazena no valor do R1 na memória e no 07h que não é usado ainda
 	SetB P1.3	
 
 	Clr A ; Limpamos o valor de A 
@@ -36,7 +61,7 @@ PreparaConfirmaSenha:
 
 RecebeSenha: ;Vamos receber a confirmação da senha
 
-	Call ScanTeclado ;Chama a rotina que recebe a entrada do usuário e armazena no valor do R1 na memória e no R7 que agora é usado para comparacao
+	Call ScanTeclado ;Chama a rotina que recebe a entrada do usuário e armazena no valor do R1 na memória e no 07h que agora é usado para comparacao
 	SetB P1.3 
 	Clr A ; Limpamos o valor de A 
 	Mov A, #'X' ;enviamos o valor de X como caracter
@@ -79,7 +104,7 @@ PreparaTentativas: ; Chamamos a rotina que prepara o codigo em
 
 RecebeSenha2: ; Rotina para receber a senha do usuário
 	
-	Call ScanTeclado ; Rotina para armazenar o valor inserido no R7	
+	Call ScanTeclado ; Rotina para armazenar o valor inserido no 07h	
 	SetB P1.3
 	Clr A ;Limpamos o valor de A
 	Mov A,#'X' ;Movemos o valor do caracter X para o A
@@ -87,7 +112,7 @@ RecebeSenha2: ; Rotina para receber a senha do usuário
 	
 	Clr A ; Limpamos o valor de A
 	Mov A,@R0 ;Movemos para o A o valor armazenado na posicao do valor R0
-	Call Compara ;Chamamos a rotina que compara os valores do A com o R7
+	Call Compara ;Chamamos a rotina que compara os valores do A com o 07h
 	
 	Inc R0 ;Incrementamos a posicao na memoria
 	Inc R4 ;Incrementamos o numero de caracteres inseridos
@@ -359,23 +384,23 @@ Linha1:
 	RET					
 
 Bt3:	
-;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
+;Armazeno o valor no R1 para guardar na memoria e no 07h para comparacao
 	SETB F0	
-    MOV R7, #'3'
+    MOV 07h, #'3'
 	MOV @R1, #'3'
 	RET				
 
 Bt2:	
-;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
+;Armazeno o valor no R1 para guardar na memoria e no 07h para comparacao
 	SETB F0		
-    MOV R7, #'2'
+    MOV 07h, #'2'
 	MOV @R1, #'2'
 	RET				
 
 Bt1:	
-;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
+;Armazeno o valor no R1 para guardar na memoria e no 07h para comparacao
 	SETB F0		
-    MOV R7, #'1'
+    MOV 07h, #'1'
 	MOV @R1, #'1'
 	RET				
 
@@ -387,23 +412,23 @@ Linha2:
 	RET					
 
 Bt6:	
-;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
+;Armazeno o valor no R1 para guardar na memoria e no 07h para comparacao
 	SETB F0		
-    MOV R7, #'6'
+    MOV 07h, #'6'
 	MOV @R1, #'6'
 	RET				
 
 Bt5:	
-;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
+;Armazeno o valor no R1 para guardar na memoria e no 07h para comparacao
 	SETB F0		
-    MOV R7, #'5'
+    MOV 07h, #'5'
 	MOV @R1, #'5'
 	RET				
 
 Bt4:	
-;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
+;Armazeno o valor no R1 para guardar na memoria e no 07h para comparacao
 	SETB F0		
-    MOV R7, #'4'
+    MOV 07h, #'4'
 	MOV @R1, #'4'
 	RET				
 
@@ -415,23 +440,23 @@ Linha3:
 	RET					
 
 Bt9:	
-;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
+;Armazeno o valor no R1 para guardar na memoria e no 07h para comparacao
 	SETB F0		
-    MOV R7, #'9'
+    MOV 07h, #'9'
 	MOV @R1, #'9'
 	RET				
 
 Bt8:	
-;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
+;Armazeno o valor no R1 para guardar na memoria e no 07h para comparacao
 	SETB F0		
-    MOV R7, #'8'
+    MOV 07h, #'8'
 	MOV @R1, #'8'	
 	RET				
 
 Bt7:	
-;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
+;Armazeno o valor no R1 para guardar na memoria e no 07h para comparacao
 	SETB F0		
-    MOV R7, #'7'
+    MOV 07h, #'7'
 	MOV @R1, #'7'	
 	RET				
 
@@ -441,9 +466,9 @@ Linha4:
 	RET					
 
 Bt0:	
-;Armazeno o valor no R1 para guardar na memoria e no R7 para comparacao
+;Armazeno o valor no R1 para guardar na memoria e no 07h para comparacao
 	SETB F0	
-    MOV R7, #'0'
+    MOV 07h, #'0'
 	MOV @R1, #'0'	
 	RET				
 		
@@ -483,6 +508,11 @@ GiraMotor: ;Rotina para girar parte do motor
 ;Colocamos cada caracter para podermos usar outros tipos de caracteres e espacos
 ;Usamos o 0 como controle para saber quando o texto acaba
 ;----------------------------------------------------------------------------------
+
+TxtTiago: 			DB 'T', 'I', 'A', 'G', 'O', 0
+TxtHenrique:   		DB 'H', 'E', 'N', 'R', 'I', 'Q', 'U', 'E', 0
+TxtApresenta1:		DB 'P', 'R', 'O', 'G', 'R', 'A', 'M', 'A', 0
+TxtApresenta2:		DB 'F', 'E', 'I', 'T', 'O', 32, 'P', 'O', 'R', 0
 
 TxtPedeSenha:		DB 'C', 'R', 'I', 'E', 32, 'S', 'E', 'N', 'H', 'A',':',0
 TxtConfirmaSenha:   DB 'C', 'O', 'N', 'F', 'I', 'R', 'M', 'E', ':', 0
